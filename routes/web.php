@@ -15,4 +15,6 @@ $router->get('/', function () use ($router) {
     return $router->app->version();
 });
 
-$router->get('/obtener_dependencias', 'obtener_dependencias@DependenciaController');
+$router->get('/obtener_dependencias', 'DependenciaController@obtener_dependencias');
+
+$router->post('/registrar', 'RegistroController@registrar');

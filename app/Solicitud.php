@@ -8,4 +8,6 @@ class Solicitud extends Model{
     
     protected $table = 'solicitud';
 
+    protected $fillable = ['id_usuario', 'estado'];
+
 }
