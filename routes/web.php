@@ -14,3 +14,5 @@
 $router->get('/', function () use ($router) {
     return $router->app->version();
 });
+
+$router->get('/obtener_dependencias', 'obtener_dependencias@DependenciaController');
