@@ -25,6 +25,7 @@ class SolicitudesController extends Controller{
                                         t2.telefono,
                                         t3.nombre as dependencia,
                                         t4.nombre as estado, 
+                                        t4.id as id_estado,
                                         t4.color as color,
                                         t5.nombre as nivel
                                     from solicitud t1
