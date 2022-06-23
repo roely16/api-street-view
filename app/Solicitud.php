@@ -10,4 +10,8 @@ class Solicitud extends Model{
 
     protected $fillable = ['id_usuario', 'estado'];
 
+    public function usuario(){
+        
+    }
+
 }

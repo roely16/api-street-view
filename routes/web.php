@@ -18,3 +18,11 @@ $router->get('/', function () use ($router) {
 $router->get('/obtener_dependencias', 'DependenciaController@obtener_dependencias');
 
 $router->post('/registrar', 'RegistroController@registrar');
+
+$router->get('/obtener_solicitudes', 'SolicitudesController@obtener_solicitudes');
+
+$router->post('/detalle_solicitud', 'SolicitudesController@detalle_solicitud');
+
+$router->post('/actualizar_solicitud', 'SolicitudesController@actualizar_solicitud');
+
+$router->post('/login', 'LoginController@login');
