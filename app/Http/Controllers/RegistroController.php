@@ -4,7 +4,7 @@ namespace App\Http\Controllers;
  
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Crypt;
 
 use App\Mail\MailSolicitud;
 use Illuminate\Support\Facades\Mail;
@@ -39,7 +39,7 @@ class RegistroController extends Controller{
                 'id_dependencia' => $request->id_dependencia, 
                 'email' => $request->email,
                 'telefono' => $request->telefono,
-                'password' => Hash::make($request->password)
+                'password' => Crypt::encrypt($request->password)
             ]);
 
             // * Buscar la dependencia

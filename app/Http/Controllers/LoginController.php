@@ -5,7 +5,10 @@ namespace App\Http\Controllers;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 
-use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Crypt;
+
+use App\Mail\MailPassword;
+use Illuminate\Support\Facades\Mail;
 
 use App\Usuario;
 use App\Solicitud;
@@ -32,7 +35,7 @@ class LoginController extends Controller{
 
             }
 
-            if (!Hash::check($request->password, $usuario->password)) {
+            if (Crypt::decrypt($usuario->password) != $request->password) {
                 
                 // * Credenciales incorrectas
                 $response = [
@@ -86,6 +89,44 @@ class LoginController extends Controller{
 
             return response()->json($response, 400);
 
+        }
+
+    }
+
+    public function recover_password(Request $request){
+
+        try {
+            
+            $usuario = Usuario::where('email', $request->email)->first();
+
+            if (!$usuario) {
+                
+                $response = [
+                    'icon' => 'info',
+                    'text' => 'No existe ninguna cuenta con el correo electrónico ingresado.',
+                ];
+
+                return response()->json($response, 400);
+
+            }
+
+            $data = [
+                'email' => $usuario->email,
+                'password' => Crypt::decrypt($usuario->password)
+            ];
+        
+            Mail::to($usuario->email)->send(new MailPassword($data));
+
+            $response = [
+                'icon' => 'success',
+                'title' => 'Excelente',
+                'text' => 'Se ha enviado un correo electrónico con las instrucciones para recuperar su contraseña.'
+            ];
+
+            return response()->json($response);
+
+        } catch (\Throwable $th) {
+            //throw $th;
         }
 
     }

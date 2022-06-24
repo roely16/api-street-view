@@ -26,3 +26,5 @@ $router->post('/detalle_solicitud', 'SolicitudesController@detalle_solicitud');
 $router->post('/actualizar_solicitud', 'SolicitudesController@actualizar_solicitud');
 
 $router->post('/login', 'LoginController@login');
+
+$router->post('/recover_password', 'LoginController@recover_password');
