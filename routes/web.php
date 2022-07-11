@@ -28,3 +28,9 @@ $router->post('/actualizar_solicitud', 'SolicitudesController@actualizar_solicit
 $router->post('/login', 'LoginController@login');
 
 $router->post('/recover_password', 'LoginController@recover_password');
+
+$router->post('/logout', 'LoginController@logout');
+
+$router->post('/check_session', 'LoginController@check_session');
+
+$router->post('close_session', 'LoginController@close_session');

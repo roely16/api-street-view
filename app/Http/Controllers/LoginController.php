@@ -14,6 +14,9 @@ use App\Usuario;
 use App\Solicitud;
 use App\Estado;
 use App\Nivel;
+use App\Bitacora;
+
+use Carbon\Carbon;
 
 class LoginController extends Controller{
 
@@ -63,6 +66,37 @@ class LoginController extends Controller{
 
             }
 
+            // Validar si no existe una sesión activa
+            $bitacora = Bitacora::where('id_usuario', $usuario->id)
+                        ->whereNull('logout_at')
+                        ->orderBy('id', 'desc')
+                        ->first();
+
+            if ($bitacora) {
+                
+                if ($bitacora->login_at) {
+                
+                    // El último registro es de ingreso por lo que existe una sesión activa y no se puede crear otra
+                    $response = [
+                        'icon' => 'info',
+                        'title' => 'Sesión Activa',
+                        'text' => '¿Desea cerrar la sesión anterior?',
+                        'showCancelButton' => true,
+                        'confirmButtonColor' => '#d33',
+                        'cancelButtonColor' => '#000',
+                        'confirmButtonText' => 'Cerrar Sesión!',
+                        'cancelButtonText' => 'No',
+                        'reverseButtons' => true,
+                        'action' => 'close_session',
+                        'id_bitacora' => $bitacora->id
+                    ];
+    
+                    return response()->json($response, 400);
+    
+                }
+
+            }
+            
             $nivel = null;
             
             // * Si el usuario tiene un nivel
@@ -72,10 +106,19 @@ class LoginController extends Controller{
 
             }
 
+            // Registrar en la bitácora el inicio de sesión
+            $bitacora = new Bitacora();
+            $bitacora->id_usuario = $usuario->id;
+            $bitacora->login_at = Carbon::now();
+            $bitacora->session_id = $request->tabId;
+            $bitacora->save();
+
             $response = [
                 'url' => $nivel ? $nivel->visor : null,
                 'id_usuario' => $usuario->id,
-                'nombre' => $usuario->nombre
+                'nombre' => $usuario->nombre,
+                'email' => $usuario->email,
+                'tabId' => $bitacora->session_id
             ];
 
             return response()->json($response, 200);
@@ -124,6 +167,66 @@ class LoginController extends Controller{
             ];
 
             return response()->json($response);
+
+        } catch (\Throwable $th) {
+            //throw $th;
+        }
+
+    }
+
+    public function logout(Request $request){
+
+        try {
+            
+            // Registrar en la bitácora
+            Bitacora::where('id_usuario', $request->id)->where('session_id', $request->tabId)->update(['logout_at' => Carbon::now()]);
+
+            $response = [
+                'status' => 200
+            ];
+
+            return response()->json($response);
+
+        } catch (\Throwable $th) {
+            
+            $response = [
+                'message' => $th->getMessage()
+            ];
+
+            return response()->json($response, 400);
+
+        }
+
+    }
+
+    public function check_session(Request $request){
+
+        try {
+            
+            // Validar que exista una sesión con el id brindado
+            $bitacora = Bitacora::where('session_id', $request->session_id)
+                        ->where('logout_at', null)
+                        ->first();
+
+            $response = [
+                'status' => $bitacora ? 200 : 400
+            ];
+
+            return response()->json($response);
+
+        } catch (\Throwable $th) {
+            //throw $th;
+        }
+
+    }
+
+    public function close_session(Request $request){
+
+        try {
+            
+            $bitacora = Bitacora::find($request->id);
+            $bitacora->logout_at = Carbon::now();
+            $bitacora->save();
 
         } catch (\Throwable $th) {
             //throw $th;
