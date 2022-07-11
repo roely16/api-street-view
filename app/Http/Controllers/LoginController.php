@@ -118,7 +118,8 @@ class LoginController extends Controller{
                 'id_usuario' => $usuario->id,
                 'nombre' => $usuario->nombre,
                 'email' => $usuario->email,
-                'tabId' => $bitacora->session_id
+                'tabId' => $bitacora->session_id,
+                'bitacora_id' => $bitacora->id
             ];
 
             return response()->json($response, 200);
@@ -179,7 +180,9 @@ class LoginController extends Controller{
         try {
             
             // Registrar en la bitácora
-            Bitacora::where('id_usuario', $request->id)->where('session_id', $request->tabId)->update(['logout_at' => Carbon::now()]);
+            $bitacora = Bitacora::find($request->bitacora_id);
+            $bitacora->logout_at = Carbon::now();
+            $bitacora->save();
 
             $response = [
                 'status' => 200
